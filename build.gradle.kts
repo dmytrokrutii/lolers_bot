@@ -14,11 +14,6 @@ application {
    mainClass.set("org.lolers.Main")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17  // Specify your desired Java version here
-    targetCompatibility = JavaVersion.VERSION_17  // Ensure the same version for compiling and targeting
-}
-
 dependencies {
     implementation("org.telegram:telegrambots:6.9.7.1")
     implementation("io.javalin:javalin:6.3.0")
