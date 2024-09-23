@@ -113,7 +113,6 @@ public class Storage {
         }
     }
 
-
     public static class PollStorage {
         public static final int MAX_SIZE = 3;
 
