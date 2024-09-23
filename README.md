@@ -8,7 +8,7 @@ These instructions will help you set up and run the project on your local machin
 
 ### Prerequisites
 
-- **Java Development Kit (JDK)**: Ensure you have JDK 11 or higher installed.
+- **Java Development Kit (JDK)**: Ensure you have JDK 17 or higher installed.
 - **Gradle**: Ensure you have Gradle installed.
 
 ### Installing
