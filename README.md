@@ -33,15 +33,7 @@ You can run the application using the `run` task provided by the Gradle applicat
 ```sh
 gradle run
 ```
-
-### Running the Tests
-
-You can run the test suite using Gradle:
-
-```sh
-gradle test
-```
-
+./g
 ### Project Structure
 
 - **`src/main/java`**: Main project source code
