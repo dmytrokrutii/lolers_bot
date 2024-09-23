@@ -33,13 +33,6 @@ You can run the application using the `run` task provided by the Gradle applicat
 ```sh
 gradle run
 ```
-./g
-### Project Structure
-
-- **`src/main/java`**: Main project source code
-- **`src/test/java`**: Test source code
-- **`build.gradle`**: Project build file
-- **`settings.gradle`**: Gradle settings file
 
 ## Authors
 - [Dmytro Krutii](https://github.com/dmytrokrutii)
