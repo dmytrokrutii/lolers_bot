@@ -46,7 +46,7 @@ public class MuteServiceImpl implements MuteService {
         var messageId = Storage.MutedUserStorage.getMutedUser(pollId).messageId();
         try {
             var tag = mutedUser.user().tag();
-            if (votes.yes() <= votes.no()) {
+            if (votes.yes() <= votes.no() && votes.yes() <= 1) {
                 Storage.MutedUserStorage.removeMutedUserByPoll(pollId);
                 Storage.PollStorage.remove(pollId);
                 var msg = String.format(TEMPLATE, String.format(FAILED_MUTE_MESSAGE, tag));
