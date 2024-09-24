@@ -6,14 +6,15 @@ import com.google.inject.Singleton;
 import org.lolers.service.MessageService;
 import org.lolers.service.PollService;
 import org.lolers.storage.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 @Singleton
 public class TagCommand implements Command {
-    private static final Logger LOGGER = Logger.getLogger(TagCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagCommand.class.getName());
 
     private final Provider<MessageService> provider;
     private final PollService pollService;
@@ -38,7 +39,7 @@ public class TagCommand implements Command {
             }
         } catch (Exception e) {
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_COMMAND_MESSAGE, true);
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
 
     }

@@ -8,13 +8,14 @@ import org.lolers.infrastructure.schedule.SchedulerService;
 import org.lolers.service.MessageService;
 import org.lolers.service.MuteService;
 import org.lolers.storage.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 @Singleton
 public class MuteServiceImpl implements MuteService {
-    private final static Logger LOGGER = Logger.getLogger(MuteServiceImpl.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(MuteServiceImpl.class.getName());
     private static final String UNMUTE_MSG = "✅ %s час мута сплинув, можеш писати повідомлення";
     //language=HTML
     private final static String TEMPLATE = """
@@ -66,7 +67,7 @@ public class MuteServiceImpl implements MuteService {
             var msg = String.format(TEMPLATE, String.format(MUTE_MESSAGE, tag));
             messageService.get().replyOnMessage(chatId, messageId, msg, true);
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
             messageService.get().replyOnMessage(chatId, messageId, Command.FAILED_COMMAND_MESSAGE, true);
         }
 

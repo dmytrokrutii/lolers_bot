@@ -4,14 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.lolers.service.CleanerService;
 import org.lolers.service.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.logging.Logger;
-
 @Singleton
 public class CleanServiceImpl implements CleanerService {
-    private static final Logger LOGGER = Logger.getLogger(CleanServiceImpl.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CleanServiceImpl.class.getName());
 
     private final MessageService messageService;
 
@@ -29,7 +29,7 @@ public class CleanServiceImpl implements CleanerService {
         try {
             messageService.deleteMessage(deleteMsg);
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

@@ -3,6 +3,8 @@ package org.lolers.storage;
 import org.lolers.model.MutedUserModel;
 import org.lolers.model.User;
 import org.lolers.model.Votes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -11,11 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Storage {
-    private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Storage.class.getName());
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static class UserStorage {
@@ -43,7 +44,7 @@ public class Storage {
                         .map(User::tag)
                         .collect(Collectors.joining(" "));
             } catch (ParseException e) {
-                LOGGER.warning("loadUsers:: failed to load users data");
+                LOGGER.error("loadUsers:: failed to load users data");
                 throw new RuntimeException(e);
             }
             data.forEach(user -> users.put(user.tag(), user));

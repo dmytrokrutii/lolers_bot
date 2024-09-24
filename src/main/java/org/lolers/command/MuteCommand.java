@@ -7,13 +7,13 @@ import org.lolers.infrastructure.Mapper;
 import org.lolers.service.MessageService;
 import org.lolers.service.PollService;
 import org.lolers.storage.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.logging.Logger;
 
 @Singleton
 public class MuteCommand implements Command {
-    private static final Logger LOGGER = Logger.getLogger(MuteCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MuteCommand.class.getName());
     private final static String MAX_POLL_ERR_MSG = "⚠️ Одночасно можна створювати не більше %d голосувань";
     private final static String DURATION_ERR_MSG = "⚠️ Тривалість мута може бути в діапазоні від 1 до 60 хвилин";
     private final static String SELF_MUTE_MSG = "\uD83E\uDD21 як знаєш...";
@@ -54,7 +54,7 @@ public class MuteCommand implements Command {
             pollService.initMutePoll(initDto);
         } catch (Exception e) {
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_MUTE_MESSAGE, true);
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

@@ -10,14 +10,15 @@ import org.lolers.service.MessageService;
 import org.lolers.service.MuteService;
 import org.lolers.service.PollService;
 import org.lolers.storage.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 @Singleton
 public class PollServiceImpl implements PollService {
-    private static final Logger LOGGER = Logger.getLogger(PollServiceImpl.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(PollServiceImpl.class.getName());
     private static final int POLL_DURATION = 60;
     private static final String MUTE_QUESTION = "\uD83D\uDDF3 Мутаємо %s на %d хвилин(у)?\nℹ\uFE0F Голосування закриється після %d секунд";
     private static final String BASE_POLL_QUESTION = "\uD83D\uDDF3 %s?";
@@ -45,7 +46,7 @@ public class PollServiceImpl implements PollService {
             SchedulerService.scheduleTask(() -> muteService.mute(pollId, payload.chatId()), POLL_DURATION + 10, TimeUnit.SECONDS);
             Storage.PollStorage.add(pollId);
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
             messageService.replyOnMessage(payload.chatId(), payload.messageId(), Command.FAILED_COMMAND_MESSAGE, true);
         }
     }
@@ -56,7 +57,7 @@ public class PollServiceImpl implements PollService {
         try {
             messageService.sendMessage(poll);
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
             messageService.sendMessage(chatId, Command.FAILED_COMMAND_MESSAGE, true);
         }
 

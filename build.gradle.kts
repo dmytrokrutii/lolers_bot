@@ -1,22 +1,41 @@
 plugins {
-    id("java")
     id("application")
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "org.lolers"
+version = "1.0"
 
 repositories {
     mavenCentral()
 }
 
 application {
-   mainClass.set("org.lolers.Main")
+    mainClass.set("org.lolers.Main")
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.register<Jar>("fatJar") {
+    group = "build"
+    description = "Assembles a fat JAR containing all dependencies."
+
+    archiveClassifier.set("fat")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
+
+    from(sourceSets.main.get().output)
+
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
+    })
+    dependsOn("jar")
 }
 
 dependencies {

@@ -17,11 +17,11 @@ import org.lolers.service.impl.CleanServiceImpl;
 import org.lolers.service.impl.MessageServiceImpl;
 import org.lolers.service.impl.MuteServiceImpl;
 import org.lolers.service.impl.PollServiceImpl;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppModule extends AbstractModule {
-    private static final Logger LOGGER = Logger.getLogger(AppModule.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppModule.class.getName());
 
     @Override
     protected void configure() {

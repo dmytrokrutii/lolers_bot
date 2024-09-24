@@ -6,13 +6,13 @@ import com.google.inject.Singleton;
 import org.lolers.infrastructure.Mapper;
 import org.lolers.service.MessageService;
 import org.lolers.storage.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import java.util.logging.Logger;
 
 @Singleton
 public class UnmuteCommand implements Command {
-    private static final Logger LOGGER = Logger.getLogger(UnmuteCommand.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnmuteCommand.class.getName());
     private static final String UNMUTE_MSG = "✅ %s розмутано, але наступного разу краще подумай перед тим як щось писати";
     private static final String USER_UNMUTED_MSG = "ℹ\uFE0F %s і так не в муті";
 
@@ -40,7 +40,7 @@ public class UnmuteCommand implements Command {
                 messageService.replyOnMessage(chatId, messageId, msg, false);
             }
         } catch (Exception e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.error(e.getMessage());
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_COMMAND_MESSAGE, true);
         }
     }
