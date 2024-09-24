@@ -19,7 +19,7 @@ public class LolersApi {
     }
 
     public void start() {
-        var app = Javalin.create().start(8080);
+        var app = Javalin.create().start(8443);
 
         app.post("/" + WEBHOOK, ctx -> {
             try {
