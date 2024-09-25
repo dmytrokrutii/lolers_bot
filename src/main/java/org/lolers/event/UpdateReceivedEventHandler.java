@@ -32,9 +32,9 @@ public class UpdateReceivedEventHandler {
         }
         if (update.hasMessage() && update.getMessage().hasText()) {
             Optional.of(update.getMessage().getText())
+                    .filter(s -> s.startsWith("/"))
                     .map(txt -> txt.split(" "))
                     .map(arr -> arr[0])
-                    .filter(s -> s.startsWith("/"))
                     .ifPresent(command -> commandInvoker.execute(command, update));
         } else if (update.hasPoll()) {
             updatePollResults(update);
