@@ -15,7 +15,7 @@ public class SchedulerService {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(POOL_SIZE);
 
     public static void scheduleTask(Runnable task, long delay, TimeUnit timeUnit) {
-        LOGGER.info(String.format("scheduleTask:: Init scheduled task, delay: %d, timeUnit: %s", delay, timeUnit));
+        LOGGER.info("scheduleTask:: Init scheduled task, delay: {}, timeUnit: {}", delay, timeUnit);
         scheduler.schedule(task, delay, timeUnit);
     }
 }

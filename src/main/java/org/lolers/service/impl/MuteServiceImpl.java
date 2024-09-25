@@ -44,7 +44,7 @@ public class MuteServiceImpl implements MuteService {
         LOGGER.info("mute:: Starting mute process");
         var votes = Storage.PollStorage.get(pollId);
         var mutedUser = Storage.MutedUserStorage.getMutedUser(pollId);
-        var messageId = Storage.MutedUserStorage.getMutedUser(pollId).messageId();
+        var messageId = mutedUser.messageId();
         try {
             var tag = mutedUser.user().tag();
             if (votes.yes() <= votes.no() || votes.yes() <= 1) {
@@ -58,7 +58,7 @@ public class MuteServiceImpl implements MuteService {
             Storage.MutedUserStorage.setMuted(pollId, muteEndTime);
             Storage.PollStorage.remove(pollId);
             SchedulerService.scheduleTask(() -> {
-                if (Storage.MutedUserStorage.isMuted(pollId)) {
+                if (Storage.MutedUserStorage.isMutedByPollId(pollId)) {
                     messageService.get().sendMessage(chatId, String.format(UNMUTE_MSG, tag), false);
                     Storage.MutedUserStorage.removeMutedUserByPoll(pollId);
                 }

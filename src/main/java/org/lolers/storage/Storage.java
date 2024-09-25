@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -104,7 +105,7 @@ public class Storage {
 
         }
 
-        public static Boolean isMuted(String tag) {
+        public static boolean isMuted(String tag) {
             return mutedUsers.values()
                     .stream()
                     .filter(u -> Objects.equals(u.user().tag(), tag))
@@ -112,6 +113,12 @@ public class Storage {
                     .map(MutedUserModel::muted)
                     .orElse(false);
         }
+
+      public static boolean isMutedByPollId(String pollId) {
+        return Optional.ofNullable(mutedUsers.get(pollId))
+                .map(MutedUserModel::muted)
+                .orElse(false);
+      }
     }
 
     public static class PollStorage {

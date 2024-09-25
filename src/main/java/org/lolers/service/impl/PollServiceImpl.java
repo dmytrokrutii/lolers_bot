@@ -28,7 +28,6 @@ public class PollServiceImpl implements PollService {
     private final MessageService messageService;
     private final MuteService muteService;
 
-
     @Inject
     public PollServiceImpl(MessageService messageService, MuteService muteService) {
         this.messageService = messageService;

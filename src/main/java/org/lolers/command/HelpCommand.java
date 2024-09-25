@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Singleton
 public class HelpCommand implements Command {
     private final Provider<MessageService> provider;
+    //language=HTML
     private static final String INFO = """
             <b> Доступні наступні команди: </b>
             <code>/all</code> - тегнути всіх

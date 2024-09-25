@@ -17,6 +17,7 @@ public class MuteCommand implements Command {
     private final static String MAX_POLL_ERR_MSG = "⚠️ Одночасно можна створювати не більше %d голосувань";
     private final static String DURATION_ERR_MSG = "⚠️ Тривалість мута може бути в діапазоні від 1 до 60 хвилин";
     private final static String SELF_MUTE_MSG = "\uD83E\uDD21 як знаєш...";
+    //language=HTML
     private final static String FAILED_MUTE_MESSAGE = """
             <b>❌ Викнила помилка при обробці команди</b>
             Приклад використання команди: <code>/mute @user time</code>
