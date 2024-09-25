@@ -22,7 +22,6 @@ public class Bot extends TelegramWebhookBot {
     @Inject
     public Bot(Provider<EventBus> bus) {
         super(System.getProperty(TOKEN_ENV));
-        logger.info("ENV VARS {}", System.getProperty(TOKEN_ENV));
         this.bus = bus;
     }
 
