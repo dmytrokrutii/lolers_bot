@@ -47,7 +47,7 @@ public class MuteServiceImpl implements MuteService {
         var messageId = Storage.MutedUserStorage.getMutedUser(pollId).messageId();
         try {
             var tag = mutedUser.user().tag();
-            if (votes.yes() <= votes.no() && votes.yes() <= 1) {
+            if (votes.yes() <= votes.no() || votes.yes() <= 1) {
                 Storage.MutedUserStorage.removeMutedUserByPoll(pollId);
                 Storage.PollStorage.remove(pollId);
                 var msg = String.format(TEMPLATE, String.format(FAILED_MUTE_MESSAGE, tag));
@@ -62,7 +62,6 @@ public class MuteServiceImpl implements MuteService {
                     messageService.get().sendMessage(chatId, String.format(UNMUTE_MSG, tag), false);
                     Storage.MutedUserStorage.removeMutedUserByPoll(pollId);
                 }
-
             }, mutedUser.muteDurationMinutes(), TimeUnit.MINUTES);
             var msg = String.format(TEMPLATE, String.format(MUTE_MESSAGE, tag));
             messageService.get().replyOnMessage(chatId, messageId, msg, true);
@@ -70,7 +69,6 @@ public class MuteServiceImpl implements MuteService {
             LOGGER.error(e.getMessage());
             messageService.get().replyOnMessage(chatId, messageId, Command.FAILED_COMMAND_MESSAGE, true);
         }
-
     }
 
     private long getDurationInMillis(long duration) {
