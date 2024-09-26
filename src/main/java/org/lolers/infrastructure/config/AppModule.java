@@ -34,6 +34,7 @@ public class AppModule extends AbstractModule {
         commandBinder.addBinding().to(TagCommand.class);
         commandBinder.addBinding().to(UnmuteCommand.class);
         commandBinder.addBinding().to(HelpCommand.class);
+        commandBinder.addBinding().to(RandomCommand.class);
 
         bind(UpdateReceivedEventHandler.class);
         bind(EventBus.class);

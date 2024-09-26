@@ -13,14 +13,16 @@ public class CommandsConfig {
     private final TagCommand tagCommand;
     private final UnmuteCommand unmuteCommand;
     private final HelpCommand helpCommand;
+    private final RandomCommand randomCommand;
 
     @Inject
-    public CommandsConfig(CommandInvoker invoker, MuteCommand muteCommand, UnmuteCommand unmuteCommand, TagCommand tagCommand, HelpCommand helpCommand) {
+    public CommandsConfig(CommandInvoker invoker, MuteCommand muteCommand, UnmuteCommand unmuteCommand, TagCommand tagCommand, HelpCommand helpCommand, RandomCommand randomCommand) {
         this.invoker = invoker;
         this.muteCommand = muteCommand;
         this.unmuteCommand = unmuteCommand;
         this.tagCommand = tagCommand;
         this.helpCommand = helpCommand;
+        this.randomCommand = randomCommand;
     }
 
     @PostConstruct
@@ -29,5 +31,6 @@ public class CommandsConfig {
         invoker.register("/unmute", unmuteCommand);
         invoker.register("/all", tagCommand);
         invoker.register("/help", helpCommand);
+        invoker.register("/r", randomCommand);
     }
 }
