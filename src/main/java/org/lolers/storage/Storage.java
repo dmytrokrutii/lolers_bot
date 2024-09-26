@@ -63,8 +63,8 @@ public class Storage {
     public static class MutedUserStorage {
         private static final Map<String, MutedUserModel> mutedUsers = new ConcurrentHashMap<>();
 
-        public static void addMutedCandidate(String pollId, int messageId, User user, int duration) {
-            mutedUsers.put(pollId, new MutedUserModel(user, messageId, duration, 0, false));
+        public static void addMutedCandidate(String pollId, int messageId, User user, int duration, long chatId) {
+            mutedUsers.put(pollId, new MutedUserModel(user, messageId, chatId, duration, 0, false));
         }
 
         public static MutedUserModel getMutedUser(String pollId) {
@@ -76,6 +76,7 @@ public class Storage {
                     new MutedUserModel(
                             mutedUserModel.user(),
                             mutedUserModel.messageId(),
+                            mutedUserModel.chatId(),
                             mutedUserModel.muteDurationMinutes(),
                             endTime,
                             true
@@ -83,10 +84,10 @@ public class Storage {
             );
         }
 
-        public static boolean isMuted(long userId) {
+        public static boolean isMuted(long userId, long chatId) {
             return mutedUsers.values()
                     .stream()
-                    .filter(u -> u.user().id() == userId)
+                    .filter(u -> u.user().id() == userId && u.chatId() == chatId)
                     .findFirst()
                     .map(MutedUserModel::muted)
                     .orElse(false);
@@ -105,20 +106,20 @@ public class Storage {
 
         }
 
-        public static boolean isMuted(String tag) {
+        public static boolean isMuted(String tag, long chatId) {
             return mutedUsers.values()
                     .stream()
-                    .filter(u -> Objects.equals(u.user().tag(), tag))
+                    .filter(u -> Objects.equals(u.user().tag(), tag) && u.chatId() == chatId)
                     .findFirst()
                     .map(MutedUserModel::muted)
                     .orElse(false);
         }
 
-      public static boolean isMutedByPollId(String pollId) {
-        return Optional.ofNullable(mutedUsers.get(pollId))
-                .map(MutedUserModel::muted)
-                .orElse(false);
-      }
+        public static boolean isMutedByPollId(String pollId) {
+            return Optional.ofNullable(mutedUsers.get(pollId))
+                    .map(MutedUserModel::muted)
+                    .orElse(false);
+        }
     }
 
     public static class PollStorage {

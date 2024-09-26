@@ -8,6 +8,7 @@ import org.lolers.command.CommandInvoker;
 import org.lolers.model.Votes;
 import org.lolers.service.CleanerService;
 import org.lolers.storage.Storage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Optional;
@@ -52,8 +53,11 @@ public class UpdateReceivedEventHandler {
         } else if (update.hasChatMember()) {
             userId = update.getChatMember().getFrom().getId();
         }
+        var chatId = Optional.ofNullable(update.getMessage())
+                .map(Message::getChatId);
         return Optional.ofNullable(userId)
-                .map(Storage.MutedUserStorage::isMuted)
+                .filter(it -> chatId.isPresent())
+                .map(it -> Storage.MutedUserStorage.isMuted(it, chatId.get()))
                 .orElse(false);
     }
 

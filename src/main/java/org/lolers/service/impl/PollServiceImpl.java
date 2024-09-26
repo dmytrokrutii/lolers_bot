@@ -41,8 +41,8 @@ public class PollServiceImpl implements PollService {
             var poll = Mapper.toMutePoll(payload, MUTE_QUESTION, MUTE_OPTIONS, POLL_DURATION);
             var msg = messageService.sendMessage(poll);
             var pollId = msg.getPoll().getId();
-            Storage.MutedUserStorage.addMutedCandidate(pollId, payload.messageId(), payload.user(), payload.duration());
-            SchedulerService.scheduleTask(() -> muteService.mute(pollId, payload.chatId()), POLL_DURATION + 10, TimeUnit.SECONDS);
+            Storage.MutedUserStorage.addMutedCandidate(pollId, payload.messageId(), payload.user(), payload.duration(), payload.chatId());
+            SchedulerService.scheduleTask(() -> muteService.mute(pollId, payload.chatId()), POLL_DURATION + 5, TimeUnit.SECONDS);
             Storage.PollStorage.add(pollId);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -59,6 +59,5 @@ public class PollServiceImpl implements PollService {
             LOGGER.error(e.getMessage());
             messageService.sendMessage(chatId, Command.FAILED_COMMAND_MESSAGE, true);
         }
-
     }
 }

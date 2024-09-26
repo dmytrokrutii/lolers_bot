@@ -31,7 +31,7 @@ public class UnmuteCommand implements Command {
         var chatId = update.getMessage().getChatId();
         var messageId = update.getMessage().getMessageId();
         try {
-            if (Storage.MutedUserStorage.isMuted(tag)) {
+            if (Storage.MutedUserStorage.isMuted(tag, chatId)) {
                 Storage.MutedUserStorage.removeMutedUserByTag(tag);
                 var msg = String.format(UNMUTE_MSG, tag);
                 messageService.replyOnMessage(chatId, messageId, msg, false);
