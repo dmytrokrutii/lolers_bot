@@ -11,11 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class SupabaseClient<T extends Entity> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SupabaseClient.class);
-    private static final String EQ_FILTER = "eq.%d";
+    private static final String EQ_FILTER = "eq.%s";
 
     private final String SUPABASE_URL;
 
@@ -52,6 +53,30 @@ public class SupabaseClient<T extends Entity> {
             }
         } else {
             LOGGER.error("getEntity:: status code: {}, body: {}, table {}", response.getStatus(), response.getBody(), table.getValue());
+            throw new UnirestException("getEntity:: status code: " + response.getStatus());
+        }
+    }
+
+    public T getBy(Table table, Map<String, String> filter, Class<T[]> entityClass) {
+        LOGGER.info("getEntity:: get record by filter from table {}", table.getValue());
+
+        var request = Unirest.get(SUPABASE_URL + table.getValue());
+        filter.forEach((key, value) -> {
+            if (key != null && value != null) {
+                request.queryString(key, String.format(EQ_FILTER, value));
+            }
+        });
+        var response = request.asObject(entityClass);
+        if (response.isSuccess()) {
+            var body = response.getBody();
+            if (body != null && body.length > 0) {
+                return body[0];
+            } else {
+                LOGGER.error("getBy:: no record found for filter, table {}", table.getValue());
+                throw new UnirestException("getEntity:: no record found for filter");
+            }
+        } else {
+            LOGGER.error("getBy:: status code: {}, body: {}, table {}", response.getStatus(), response.getBody(), table.getValue());
             throw new UnirestException("getEntity:: status code: " + response.getStatus());
         }
     }

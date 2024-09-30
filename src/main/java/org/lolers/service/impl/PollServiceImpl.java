@@ -28,17 +28,19 @@ public class PollServiceImpl implements PollService {
 
     private final MessageService messageService;
     private final MuteService muteService;
+    private final SchedulerService schedulerService;
     private final MutedUserStorage mutedUserStorage;
     private final PollStorage pollStorage;
     private final Mapper mapper;
 
     @Inject
-    public PollServiceImpl(MessageService messageService, MuteService muteService, Mapper mapper, MutedUserStorage mutedUserStorage, PollStorage pollStorage) {
+    public PollServiceImpl(MessageService messageService, MuteService muteService, Mapper mapper, MutedUserStorage mutedUserStorage, PollStorage pollStorage, SchedulerService schedulerService) {
         this.messageService = messageService;
         this.muteService = muteService;
         this.mapper = mapper;
         this.mutedUserStorage = mutedUserStorage;
         this.pollStorage = pollStorage;
+        this.schedulerService = schedulerService;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class PollServiceImpl implements PollService {
             var msg = messageService.sendMessage(poll);
             var pollId = msg.getPoll().getId();
             mutedUserStorage.addMutedCandidate(pollId, payload.messageId(), payload.user(), payload.duration(), payload.chatId());
-            SchedulerService.scheduleTask(() -> muteService.mute(pollId, payload.chatId()), POLL_DURATION + 5, TimeUnit.SECONDS);
+            schedulerService.scheduleTask(() -> muteService.mute(pollId, payload.chatId()), POLL_DURATION + 5, TimeUnit.SECONDS);
             pollStorage.add(pollId);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

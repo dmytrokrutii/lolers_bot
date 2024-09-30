@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import io.javalin.Javalin;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 
 @Singleton
 public class LolersApi {

@@ -30,6 +30,13 @@ public class UserStorage {
         return users.get(tag);
     }
 
+    public User getUserById(long id) {
+        return users.values().stream()
+                .filter(user -> user.id() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
     public String getTagAllString() {
         return TAG_ALL;
     }

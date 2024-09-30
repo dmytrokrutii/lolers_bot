@@ -34,14 +34,16 @@ public class MuteServiceImpl implements MuteService {
             """;
 
     private final Provider<MessageService> messageService;
+    private final SchedulerService schedulerService;
     private final MutedUserStorage mutedUserStorage;
     private final PollStorage pollStorage;
 
     @Inject
-    MuteServiceImpl(Provider<MessageService> messageServiceProvider, MutedUserStorage mutedUserStorage, PollStorage pollStorage) {
+    MuteServiceImpl(Provider<MessageService> messageServiceProvider, MutedUserStorage mutedUserStorage, PollStorage pollStorage, SchedulerService schedulerService) {
         this.messageService = messageServiceProvider;
         this.mutedUserStorage = mutedUserStorage;
         this.pollStorage = pollStorage;
+        this.schedulerService = schedulerService;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class MuteServiceImpl implements MuteService {
             var muteEndTime = System.currentTimeMillis() + getDurationInMillis(mutedUser.muteDurationMinutes());
             mutedUserStorage.setMuted(pollId, muteEndTime);
             pollStorage.remove(pollId);
-            SchedulerService.scheduleTask(() -> {
+            schedulerService.scheduleTask(() -> {
                 if (mutedUserStorage.isMutedByPollId(pollId)) {
                     messageService.get().sendMessage(chatId, String.format(UNMUTE_MSG, tag), false);
                     mutedUserStorage.removeMutedUserByPoll(pollId);

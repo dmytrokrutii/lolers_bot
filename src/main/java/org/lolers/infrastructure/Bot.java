@@ -2,13 +2,13 @@ package org.lolers.infrastructure;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.lolers.event.UpdateReceivedEvent;
+import org.lolers.service.MessageBackupService;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
-import com.google.inject.name.Named;
-import javax.inject.Singleton;
 
 @Singleton
 public class Bot extends TelegramWebhookBot {
@@ -17,10 +17,11 @@ public class Bot extends TelegramWebhookBot {
     private final Provider<EventBus> bus;
 
     @Inject
-    public Bot(Provider<EventBus> bus, @Named("bot.username") String username, @Named("bot.token") String token) {
+    public Bot(Provider<EventBus> bus, @Named("bot.username") String username, @Named("bot.token") String token, MessageBackupService messageBackupService) {
         super(token);
         this.USERNAME = username;
         this.bus = bus;
+        messageBackupService.start();
     }
 
     @Override

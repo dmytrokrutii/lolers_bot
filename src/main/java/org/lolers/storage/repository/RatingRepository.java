@@ -19,8 +19,8 @@ public class RatingRepository {
         ratingClient.update(Table.RATING, rating);
     }
 
-    public void getById(long id) {
-        ratingClient.getById(Table.RATING, id, Rating[].class);
+    public Rating getById(long id) {
+        return ratingClient.getById(Table.RATING, id, Rating[].class);
     }
 
     public List<Rating> getAll() {

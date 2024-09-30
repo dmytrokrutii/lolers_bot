@@ -2,10 +2,12 @@ package org.lolers.infrastructure.config;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
+import it.sauronsoftware.cron4j.Scheduler;
 import org.lolers.command.*;
 import org.lolers.event.UpdateReceivedEventHandler;
 import org.lolers.infrastructure.Bot;
@@ -13,17 +15,14 @@ import org.lolers.infrastructure.EventBus;
 import org.lolers.infrastructure.LolersApi;
 import org.lolers.infrastructure.Mapper;
 import org.lolers.infrastructure.listener.PostConstructTypeListener;
-import org.lolers.service.CleanerService;
-import org.lolers.service.MessageService;
-import org.lolers.service.MuteService;
-import org.lolers.service.PollService;
-import org.lolers.service.impl.CleanServiceImpl;
-import org.lolers.service.impl.MessageServiceImpl;
-import org.lolers.service.impl.MuteServiceImpl;
-import org.lolers.service.impl.PollServiceImpl;
+import org.lolers.infrastructure.schedule.SchedulerService;
+import org.lolers.service.*;
+import org.lolers.service.impl.*;
+import org.lolers.storage.MessageStorage;
 import org.lolers.storage.MutedUserStorage;
 import org.lolers.storage.PollStorage;
 import org.lolers.storage.UserStorage;
+import org.lolers.storage.entity.Message;
 import org.lolers.storage.entity.Rating;
 import org.lolers.storage.entity.User;
 import org.lolers.storage.repository.RatingRepository;
@@ -49,6 +48,7 @@ public class AppModule extends AbstractModule {
         commandBinder.addBinding().to(UnmuteCommand.class);
         commandBinder.addBinding().to(HelpCommand.class);
         commandBinder.addBinding().to(RandomCommand.class);
+        commandBinder.addBinding().to(RatingsCommand.class);
 
         //domain
         bind(UpdateReceivedEventHandler.class);
@@ -58,6 +58,8 @@ public class AppModule extends AbstractModule {
         bind(MessageService.class).to(MessageServiceImpl.class);
         bind(CleanerService.class).to(CleanServiceImpl.class);
         bind(PollService.class).to(PollServiceImpl.class);
+        bind(MessageBackupService.class).to(MessageBackupServiceImpl.class);
+        bind(RatingService.class).to(RatingServiceImpl.class);
         bind(Bot.class);
         bind(LolersApi.class);
         bind(Mapper.class);
@@ -69,16 +71,24 @@ public class AppModule extends AbstractModule {
         bind(MutedUserStorage.class);
         bind(PollStorage.class);
         bind(RatingRepository.class);
+        bind(MessageStorage.class);
 
         //API DB clients
         bind(new TypeLiteral<SupabaseClient<Rating>>() {
         });
+        bind(new TypeLiteral<SupabaseClient<Message>>() {
+        });
+
+        //other
+        bind(SchedulerService.class);
+        bind(Scheduler.class).in(Singleton.class);
     }
 
     @Provides
     public CommandInvoker provideCommandInvoker(MuteCommand muteCommand, UnmuteCommand unmuteCommand,
-                                                TagCommand tagCommand, HelpCommand helpCommand, RandomCommand randomCommand) {
-        var commands = List.of(muteCommand, unmuteCommand, tagCommand, helpCommand, randomCommand);
+                                                TagCommand tagCommand, HelpCommand helpCommand,
+                                                RandomCommand randomCommand, RatingsCommand ratingsCommand) {
+        var commands = List.of(muteCommand, unmuteCommand, tagCommand, helpCommand, randomCommand, ratingsCommand);
         var log = commands.stream()
                 .map(Command::getInvoker)
                 .collect(Collectors.joining(" "));

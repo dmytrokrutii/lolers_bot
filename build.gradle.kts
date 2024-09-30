@@ -46,7 +46,6 @@ dependencies {
     implementation("net.engio:mbassador:1.3.2")
     implementation("com.konghq:unirest-java:3.14.5")
     implementation("it.sauronsoftware.cron4j:cron4j:2.2.5")
-
 }
 
 tasks.test {
