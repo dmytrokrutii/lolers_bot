@@ -44,6 +44,9 @@ dependencies {
     implementation("com.google.inject:guice:7.0.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("net.engio:mbassador:1.3.2")
+    implementation("com.konghq:unirest-java:3.14.5")
+    implementation("it.sauronsoftware.cron4j:cron4j:2.2.5")
+
 }
 
 tasks.test {

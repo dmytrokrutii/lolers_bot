@@ -1,10 +1,10 @@
 package org.lolers.service;
 
-import org.lolers.model.InitMutePollPayload;
+import org.lolers.dto.InitMutePollPayload;
 
 public interface PollService {
 
     void initMutePoll(InitMutePollPayload payload);
 
-    void initGamePoll(long chatId, String question);
+    void initPoll(long chatId, String question);
 }

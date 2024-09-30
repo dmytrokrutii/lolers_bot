@@ -1,18 +1,27 @@
 package org.lolers.infrastructure;
 
-import org.lolers.model.InitMutePollPayload;
-import org.lolers.storage.Storage;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.lolers.dto.InitMutePollPayload;
+import org.lolers.storage.UserStorage;
 import org.telegram.telegrambots.meta.api.methods.polls.SendPoll;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
+@Singleton
 public class Mapper {
+    private final UserStorage userStorage;
 
-    public static InitMutePollPayload toInitMutePollPayload(long chatId, Update update) {
+    @Inject
+    public Mapper(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
+    public InitMutePollPayload toInitMutePollPayload(long chatId, Update update) {
         var parts = update.getMessage().getText().split(" ");
         var tag = parts[1];
-        var user = Storage.UserStorage.getUser(tag);
+        var user = userStorage.getUser(tag);
         var selfMute = false;
         if (user.id() == update.getMessage().getFrom().getId()) {
             selfMute = true;
@@ -22,7 +31,7 @@ public class Mapper {
         return new InitMutePollPayload(chatId, messageId, user, duration, selfMute);
     }
 
-    public static SendPoll toMutePoll(InitMutePollPayload dto, String question, List<String> options, int pollDuration) {
+    public SendPoll toMutePoll(InitMutePollPayload dto, String question, List<String> options, int pollDuration) {
         var poll = new SendPoll();
         poll.setChatId(dto.chatId());
         poll.setQuestion(String.format(question, dto.user().accusativeName(), dto.duration(), pollDuration));
@@ -33,7 +42,7 @@ public class Mapper {
         return poll;
     }
 
-    public static SendPoll toPoll(long chatId, String question, String template, List<String> options) {
+    public SendPoll toPoll(long chatId, String question, String template, List<String> options) {
         var poll = new SendPoll();
         poll.setChatId(chatId);
         poll.setQuestion(String.format(template, question));
@@ -43,7 +52,7 @@ public class Mapper {
         return poll;
     }
 
-    public static String getTag(Update update) {
+    public String getTag(Update update) {
         var parts = update.getMessage().getText().split(" ");
         return parts[1];
     }

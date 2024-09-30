@@ -5,9 +5,10 @@ import com.google.inject.Singleton;
 import net.engio.mbassy.listener.Handler;
 import net.engio.mbassy.listener.Invoke;
 import org.lolers.command.CommandInvoker;
-import org.lolers.model.Votes;
 import org.lolers.service.CleanerService;
-import org.lolers.storage.Storage;
+import org.lolers.storage.MutedUserStorage;
+import org.lolers.storage.PollStorage;
+import org.lolers.storage.model.Votes;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -17,11 +18,15 @@ import java.util.Optional;
 public class UpdateReceivedEventHandler {
     private final CommandInvoker commandInvoker;
     private final CleanerService cleanerService;
+    private final PollStorage pollStorage;
+    private final MutedUserStorage mutedUserStorage;
 
     @Inject
-    public UpdateReceivedEventHandler(CommandInvoker commandInvoker, CleanerService cleanerService) {
+    public UpdateReceivedEventHandler(CommandInvoker commandInvoker, CleanerService cleanerService, PollStorage pollStorage, MutedUserStorage mutedUserStorage) {
         this.commandInvoker = commandInvoker;
         this.cleanerService = cleanerService;
+        this.pollStorage = pollStorage;
+        this.mutedUserStorage = mutedUserStorage;
     }
 
     @Handler(delivery = Invoke.Asynchronously)
@@ -42,7 +47,7 @@ public class UpdateReceivedEventHandler {
         }
     }
 
-    private static boolean shouldBeCleaned(Update update) {
+    private boolean shouldBeCleaned(Update update) {
         Long userId = null;
         if (update.hasMessage()) {
             userId = update.getMessage().getFrom().getId();
@@ -57,17 +62,17 @@ public class UpdateReceivedEventHandler {
                 .map(Message::getChatId);
         return Optional.ofNullable(userId)
                 .filter(it -> chatId.isPresent())
-                .map(it -> Storage.MutedUserStorage.isMuted(it, chatId.get()))
+                .map(it -> mutedUserStorage.isMuted(it, chatId.get()))
                 .orElse(false);
     }
 
-    private static void updatePollResults(Update update) {
+    private void updatePollResults(Update update) {
         var poll = update.getPoll();
         var id = poll.getId();
-        if (Storage.PollStorage.contains(id)) {
+        if (pollStorage.contains(id)) {
             var yesVotes = poll.getOptions().get(0).getVoterCount();
             var noVotes = poll.getOptions().get(1).getVoterCount();
-            Storage.PollStorage.update(id, new Votes(yesVotes, noVotes));
+            pollStorage.update(id, new Votes(yesVotes, noVotes));
         }
     }
 }

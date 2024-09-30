@@ -22,7 +22,7 @@ public class CleanServiceImpl implements CleanerService {
 
     @Override
     public void clean(Message message) {
-        LOGGER.info(String.format("Deleting message from %d", message.getFrom().getId()));
+        LOGGER.info("Deleting message from {}", message.getFrom().getId());
         var deleteMsg = new DeleteMessage();
         deleteMsg.setChatId(message.getChatId());
         deleteMsg.setMessageId(message.getMessageId());

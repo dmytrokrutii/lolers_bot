@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import org.lolers.infrastructure.Mapper;
 import org.lolers.service.MessageService;
 import org.lolers.service.PollService;
-import org.lolers.storage.Storage;
+import org.lolers.storage.PollStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -27,11 +27,15 @@ public class MuteCommand implements Command {
 
     private final Provider<MessageService> provider;
     private final PollService pollService;
+    private final PollStorage pollStorage;
+    private final Mapper mapper;
 
     @Inject
-    public MuteCommand(PollService pollService, Provider<MessageService> provider) {
+    public MuteCommand(PollService pollService, Provider<MessageService> provider, PollStorage pollStorage, Mapper mapper) {
         this.pollService = pollService;
         this.provider = provider;
+        this.pollStorage = pollStorage;
+        this.mapper = mapper;
     }
 
     @Override
@@ -40,11 +44,11 @@ public class MuteCommand implements Command {
         var messageService = provider.get();
         var chatId = update.getMessage().getChatId();
         try {
-            if (Storage.PollStorage.isFull()) {
-                messageService.sendMessage(chatId, String.format(MAX_POLL_ERR_MSG, Storage.PollStorage.MAX_SIZE), false);
+            if (pollStorage.isFull()) {
+                messageService.sendMessage(chatId, String.format(MAX_POLL_ERR_MSG, pollStorage.getMaxSize()), false);
                 return;
             }
-            var initDto = Mapper.toInitMutePollPayload(chatId, update);
+            var initDto = mapper.toInitMutePollPayload(chatId, update);
             if (initDto.selfMute()) {
                 messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), SELF_MUTE_MSG, false);
             }
@@ -57,5 +61,10 @@ public class MuteCommand implements Command {
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_MUTE_MESSAGE, true);
             LOGGER.error(e.getMessage());
         }
+    }
+
+    @Override
+    public String getInvoker() {
+        return "/mute";
     }
 }

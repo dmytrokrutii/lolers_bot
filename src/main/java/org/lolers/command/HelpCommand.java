@@ -34,4 +34,9 @@ public class HelpCommand implements Command {
         LOGGER.info("execute:: start executing helpCommand");
         provider.get().replyOnMessage(update.getMessage().getChatId(), update.getMessage().getMessageId(), INFO, true);
     }
+
+    @Override
+    public String getInvoker() {
+        return "/help";
+    }
 }

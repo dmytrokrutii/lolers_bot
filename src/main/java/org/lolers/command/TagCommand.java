@@ -5,7 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.lolers.service.MessageService;
 import org.lolers.service.PollService;
-import org.lolers.storage.Storage;
+import org.lolers.storage.UserStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,11 +18,13 @@ public class TagCommand implements Command {
 
     private final Provider<MessageService> provider;
     private final PollService pollService;
+    private final UserStorage userStorage;
 
     @Inject
-    public TagCommand(Provider<MessageService> provider, PollService pollService) {
+    public TagCommand(Provider<MessageService> provider, PollService pollService, UserStorage userStorage) {
         this.provider = provider;
         this.pollService = pollService;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -31,16 +33,20 @@ public class TagCommand implements Command {
         var messageService = provider.get();
         var chatId = update.getMessage().getChatId();
         try {
-            messageService.sendMessage(update.getMessage().getChatId(), Storage.UserStorage.getTagAllString(), false);
+            messageService.sendMessage(update.getMessage().getChatId(), userStorage.getTagAllString(), false);
             var parts = update.getMessage().getText().split(" ");
             if (parts.length >= 2) {
                 var args = Arrays.copyOfRange(parts, 1, parts.length);
-                pollService.initGamePoll(chatId, String.join(" ", args));
+                pollService.initPoll(chatId, String.join(" ", args));
             }
         } catch (Exception e) {
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_COMMAND_MESSAGE, true);
             LOGGER.error(e.getMessage());
         }
+    }
 
+    @Override
+    public String getInvoker() {
+        return "/all";
     }
 }

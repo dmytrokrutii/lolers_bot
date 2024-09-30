@@ -5,7 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.lolers.infrastructure.Mapper;
 import org.lolers.service.MessageService;
-import org.lolers.storage.Storage;
+import org.lolers.storage.MutedUserStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -17,22 +17,25 @@ public class UnmuteCommand implements Command {
     private static final String USER_UNMUTED_MSG = "ℹ\uFE0F %s і так не в муті";
 
     private final Provider<MessageService> provider;
+    private final MutedUserStorage mutedUserStorage;
+    private final Mapper mapper;
 
     @Inject
-    public UnmuteCommand(Provider<MessageService> provider) {
-
+    public UnmuteCommand(Provider<MessageService> provider, MutedUserStorage mutedUserStorage, Mapper mapper) {
+        this.mutedUserStorage = mutedUserStorage;
         this.provider = provider;
+        this.mapper = mapper;
     }
 
     @Override
     public void execute(Update update) {
-        var tag = Mapper.getTag(update);
+        var tag = mapper.getTag(update);
         var messageService = provider.get();
         var chatId = update.getMessage().getChatId();
         var messageId = update.getMessage().getMessageId();
         try {
-            if (Storage.MutedUserStorage.isMuted(tag, chatId)) {
-                Storage.MutedUserStorage.removeMutedUserByTag(tag);
+            if (mutedUserStorage.isMuted(tag, chatId)) {
+                mutedUserStorage.removeMutedUserByTag(tag);
                 var msg = String.format(UNMUTE_MSG, tag);
                 messageService.replyOnMessage(chatId, messageId, msg, false);
             } else {
@@ -43,5 +46,10 @@ public class UnmuteCommand implements Command {
             LOGGER.error(e.getMessage());
             messageService.replyOnMessage(chatId, update.getMessage().getMessageId(), FAILED_COMMAND_MESSAGE, true);
         }
+    }
+
+    @Override
+    public String getInvoker() {
+        return "/unmute";
     }
 }

@@ -42,6 +42,11 @@ public class RandomCommand implements Command {
             LOGGER.error(e.getMessage());
             messageServiceProvider.get().replyOnMessage(update.getMessage().getChatId(), update.getMessage().getMessageId(), FAILED_COMMAND_MESSAGE, true);
         }
-
     }
+
+    @Override
+    public String getInvoker() {
+        return "/r";
+    }
+
 }
