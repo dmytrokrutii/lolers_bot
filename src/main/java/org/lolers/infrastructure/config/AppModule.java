@@ -98,24 +98,24 @@ public class AppModule extends AbstractModule {
     @Provides
     @Named("db.url")
     public String provideDbUrl() {
-        return System.getenv("DB_URL"); // Get from environment variable
+        return System.getProperty("DB_URL"); // Get from environment variable
     }
 
     @Provides
     @Named("db.key")
     public String provideDbPassword() {
-        return System.getenv("DB_KEY");
+        return System.getProperty("DB_KEY");
     }
 
     @Provides
     @Named("bot.token")
     public String provideBotToken() {
-        return System.getenv("BOT_TOKEN");
+        return System.getProperty("BOT_TOKEN");
     }
 
     @Provides
     @Named("bot.username")
     public String provideBotName() {
-        return System.getenv("BOT_USERNAME");
+        return System.getProperty("BOT_USERNAME");
     }
 }
