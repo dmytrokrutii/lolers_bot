@@ -48,7 +48,10 @@ public class AppModule extends AbstractModule {
         commandBinder.addBinding().to(UnmuteCommand.class);
         commandBinder.addBinding().to(HelpCommand.class);
         commandBinder.addBinding().to(RandomCommand.class);
-        commandBinder.addBinding().to(RatingsCommand.class);
+        commandBinder.addBinding().to(RatingCommand.class);
+        commandBinder.addBinding().to(MeCommand.class);
+        commandBinder.addBinding().to(RpsCommand.class);
+        commandBinder.addBinding().to(FlipCommand.class);
 
         //domain
         bind(UpdateReceivedEventHandler.class);
@@ -87,8 +90,19 @@ public class AppModule extends AbstractModule {
     @Provides
     public CommandInvoker provideCommandInvoker(MuteCommand muteCommand, UnmuteCommand unmuteCommand,
                                                 TagCommand tagCommand, HelpCommand helpCommand,
-                                                RandomCommand randomCommand, RatingsCommand ratingsCommand) {
-        var commands = List.of(muteCommand, unmuteCommand, tagCommand, helpCommand, randomCommand, ratingsCommand);
+                                                RandomCommand randomCommand, RatingCommand ratingCommand,
+                                                MeCommand meCommand, RpsCommand rpsCommand, FlipCommand flipCommand) {
+        var commands = List.of(
+                muteCommand,
+                unmuteCommand,
+                tagCommand,
+                helpCommand,
+                randomCommand,
+                ratingCommand,
+                meCommand,
+                rpsCommand,
+                flipCommand
+        );
         var log = commands.stream()
                 .map(Command::getInvoker)
                 .collect(Collectors.joining(" "));

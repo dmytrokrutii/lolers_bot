@@ -10,4 +10,6 @@ public interface RatingService {
     void updateRating(RatingPayload payload);
 
     List<Rating> getRatings();
+
+    Rating getRatingByUserId(long userId);
 }

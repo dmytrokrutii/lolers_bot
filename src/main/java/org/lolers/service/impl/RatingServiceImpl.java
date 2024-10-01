@@ -20,6 +20,7 @@ public class RatingServiceImpl implements RatingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RatingServiceImpl.class);
     private static final String CLOWN = "\uD83E\uDD21";
     private static final String LIKE = "\uD83D\uDC4D";
+    private static final String FIRE = "\uD83D\uDD25";
     private static final String HEART = "❤";
 
     private final MessageStorage messageStorage;
@@ -44,7 +45,7 @@ public class RatingServiceImpl implements RatingService {
         var rating = ratingRepository.getById(userId);
         if (payload.oldReaction().isEmpty()) {
             var reaction = (ReactionTypeEmoji) payload.newReaction().get(0);
-            if (reaction.getEmoji().equals(HEART) || reaction.getEmoji().equals(LIKE)) {
+            if (reaction.getEmoji().equals(HEART) || reaction.getEmoji().equals(LIKE) || reaction.getEmoji().equals(FIRE)) {
                 rating = new Rating(rating.id(), rating.powerCounter() + 1, rating.clownCounter());
                 ratingRepository.update(rating);
             } else if (reaction.getEmoji().equals(CLOWN)) {
@@ -92,5 +93,10 @@ public class RatingServiceImpl implements RatingService {
     @Override
     public List<Rating> getRatings() {
         return ratingRepository.getAll();
+    }
+
+    @Override
+    public Rating getRatingByUserId(long userId) {
+        return ratingRepository.getById(userId);
     }
 }

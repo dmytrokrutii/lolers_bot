@@ -20,9 +20,12 @@ public class HelpCommand implements Command {
             <code>/all запитання</code> - тегнути всіх та створити опитування з запитанням
             <code>/mute @user time</code> - створити голосування за мут користувача терміном від 1 до 60 хвилин
             <code>/unmute @user</code> - розмутити користувача
-            <code>/rating</code> - рейтингова табличка
+            <code>/rating</code> - рейтингова таблиця
+            <code>/me</code> - власна статистика
             <code>/r max</code> - рандомне число від 0 до max
             <code>/r min max</code> - рандомне число в заданому діапазоні
+            <code>/rps</code> - камінь ножиці папір
+            <code>/flip</code> - підкинути монетку
             """;
 
     @Inject

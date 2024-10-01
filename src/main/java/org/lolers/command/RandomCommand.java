@@ -13,14 +13,14 @@ import java.util.Random;
 @Singleton
 public class RandomCommand implements Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomCommand.class);
-    private static final Random RANDOM = new Random();
     private static final String TEMPLATE = "\uD83C\uDFB2 Релультат: %d";
-
     private final Provider<MessageService> messageServiceProvider;
+    private final Random random;
 
     @Inject
     public RandomCommand(Provider<MessageService> messageServiceProvider) {
         this.messageServiceProvider = messageServiceProvider;
+        this.random = new Random();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class RandomCommand implements Command {
                 min = Integer.parseInt(parts[1]);
                 max = Integer.parseInt(parts[2]);
             }
-            var response = String.format(TEMPLATE, RANDOM.nextInt(max - min + 1) + min);
+            var response = String.format(TEMPLATE, random.nextInt(max - min + 1) + min);
             messageServiceProvider.get().replyOnMessage(msg.getChatId(), msg.getMessageId(), response, false);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());

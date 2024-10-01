@@ -15,12 +15,14 @@ public class Bot extends TelegramWebhookBot {
     private final String USERNAME;
 
     private final Provider<EventBus> bus;
+    private final MessageBackupService messageBackupService;
 
     @Inject
     public Bot(Provider<EventBus> bus, @Named("bot.username") String username, @Named("bot.token") String token, MessageBackupService messageBackupService) {
         super(token);
         this.USERNAME = username;
         this.bus = bus;
+        this.messageBackupService = messageBackupService;
         messageBackupService.start();
     }
 
@@ -39,5 +41,9 @@ public class Bot extends TelegramWebhookBot {
     @Override
     public String getBotPath() {
         return LolersApi.WEBHOOK;
+    }
+
+    public void forceBackUp() {
+        messageBackupService.backupData();
     }
 }
