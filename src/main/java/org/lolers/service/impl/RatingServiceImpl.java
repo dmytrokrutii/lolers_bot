@@ -2,6 +2,7 @@ package org.lolers.service.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 import org.lolers.dto.RatingPayload;
 import org.lolers.service.RatingService;
 import org.lolers.storage.MessageStorage;
@@ -22,6 +23,9 @@ public class RatingServiceImpl implements RatingService {
     private static final String LIKE = "\uD83D\uDC4D";
     private static final String FIRE = "\uD83D\uDD25";
     private static final String HEART = "❤";
+    private static final String REPLY_HEART = "❤️";
+    private static final String PARENTHESIS = ")";
+    ;
 
     private final MessageStorage messageStorage;
     private final RatingRepository ratingRepository;
@@ -43,17 +47,17 @@ public class RatingServiceImpl implements RatingService {
             return;
         }
         var rating = ratingRepository.getById(userId);
+        var isUpdated = false;
         if (payload.oldReaction().isEmpty()) {
             var reaction = (ReactionTypeEmoji) payload.newReaction().get(0);
             if (reaction.getEmoji().equals(HEART) || reaction.getEmoji().equals(LIKE) || reaction.getEmoji().equals(FIRE)) {
-                rating = new Rating(rating.id(), rating.powerCounter() + 1, rating.clownCounter());
-                ratingRepository.update(rating);
+                rating = rating.withPowerCounter(rating.powerCounter() + 1);
+                isUpdated = true;
             } else if (reaction.getEmoji().equals(CLOWN)) {
-                rating = new Rating(rating.id(), rating.powerCounter(), rating.clownCounter() + 1);
-                ratingRepository.update(rating);
+                rating = rating.withClownCounter(rating.clownCounter() + 1);
+                isUpdated = true;
             }
         } else {
-            // Collect old reactions and new reactions into sets
             var oldReactions = payload.oldReaction().stream()
                     .map(reaction -> ((ReactionTypeEmoji) reaction).getEmoji())
                     .collect(Collectors.toSet());
@@ -71,22 +75,38 @@ public class RatingServiceImpl implements RatingService {
             // Update rating based on added reactions
             for (String reaction : addedReactions) {
                 if (reaction.equals(HEART) || reaction.equals(LIKE)) {
-                    rating = new Rating(rating.id(), rating.powerCounter() + 1, rating.clownCounter());
+                    isUpdated = true;
+                    rating = rating.withPowerCounter(rating.powerCounter() + 1);
                 } else if (reaction.equals(CLOWN)) {
-                    rating = new Rating(rating.id(), rating.powerCounter(), rating.clownCounter() + 1);
+                    isUpdated = true;
+                    rating = rating.withClownCounter(rating.clownCounter() + 1);
                 }
             }
             // Update rating based on removed reactions
             for (String reaction : removedReactions) {
                 if (reaction.equals(HEART) || reaction.equals(LIKE)) {
-                    rating = new Rating(rating.id(), rating.powerCounter() - 1, rating.clownCounter());
+                    isUpdated = true;
+                    rating = rating.withPowerCounter(rating.powerCounter() - 1);
                 } else if (reaction.equals(CLOWN)) {
-                    rating = new Rating(rating.id(), rating.powerCounter(), rating.clownCounter() - 1);
+                    isUpdated = true;
+                    rating = rating.withClownCounter(rating.clownCounter() - 1);
                 }
             }
-
-            // Save the updated rating to the repository
+        }
+        if (isUpdated) {
             ratingRepository.update(rating);
+        }
+    }
+
+    @Override
+    public void updateRating(long id, String payload) {
+        Rating rating;
+        if (StringUtils.containsOnly(payload, PARENTHESIS) || payload.equals(REPLY_HEART) || payload.equals(LIKE) || payload.equals(HEART)) {
+            rating = ratingRepository.getById(id);
+            ratingRepository.update(rating.withPowerCounter(rating.powerCounter() + 1));
+        } else if (payload.equals(CLOWN)) {
+            rating = ratingRepository.getById(id);
+            ratingRepository.update(rating.withClownCounter(rating.clownCounter() + 1));
         }
     }
 

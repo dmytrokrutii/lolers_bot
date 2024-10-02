@@ -47,6 +47,7 @@ public class UpdateReceivedEventHandler {
         }
         if (update.hasMessage()) {
             var msg = update.getMessage();
+            updateRatingOnReply(msg);
             messageStorage.add(msg.getMessageId(), msg.getChatId(), msg.getFrom().getId());
             if (msg.hasText()) {
                 Optional.of(msg.getText())
@@ -94,6 +95,21 @@ public class UpdateReceivedEventHandler {
             var yesVotes = poll.getOptions().get(0).getVoterCount();
             var noVotes = poll.getOptions().get(1).getVoterCount();
             pollStorage.update(id, new Votes(yesVotes, noVotes));
+        }
+    }
+
+    private void updateRatingOnReply(Message message) {
+        var replyTo = message.getReplyToMessage();
+        String payload = null;
+        if (replyTo != null) {
+            if (message.hasText()) {
+                payload = message.getText();
+            } else if (message.hasSticker()) {
+                payload = message.getSticker().getEmoji();
+            }
+        }
+        if (payload != null) {
+            ratingService.updateRating(replyTo.getFrom().getId(), payload);
         }
     }
 }
