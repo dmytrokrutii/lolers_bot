@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 public class RatingServiceImpl implements RatingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RatingServiceImpl.class);
     private static final String CLOWN = "\uD83E\uDD21";
+    private static final String POOP = "\uD83D\uDCA9";
     private static final String LIKE = "\uD83D\uDC4D";
     private static final String FIRE = "\uD83D\uDD25";
     private static final String HEART = "❤";
     private static final String REPLY_HEART = "❤️";
     private static final String PARENTHESIS = ")";
-    ;
 
     private final MessageStorage messageStorage;
     private final RatingRepository ratingRepository;
@@ -47,16 +47,9 @@ public class RatingServiceImpl implements RatingService {
             return;
         }
         var rating = ratingRepository.getById(userId);
-        var isUpdated = false;
         if (payload.oldReaction().isEmpty()) {
             var reaction = (ReactionTypeEmoji) payload.newReaction().get(0);
-            if (reaction.getEmoji().equals(HEART) || reaction.getEmoji().equals(LIKE) || reaction.getEmoji().equals(FIRE)) {
-                rating = rating.withPowerCounter(rating.powerCounter() + 1);
-                isUpdated = true;
-            } else if (reaction.getEmoji().equals(CLOWN)) {
-                rating = rating.withClownCounter(rating.clownCounter() + 1);
-                isUpdated = true;
-            }
+            modifyNewReaction(reaction.getEmoji(), rating);
         } else {
             var oldReactions = payload.oldReaction().stream()
                     .map(reaction -> ((ReactionTypeEmoji) reaction).getEmoji())
@@ -74,27 +67,43 @@ public class RatingServiceImpl implements RatingService {
 
             // Update rating based on added reactions
             for (String reaction : addedReactions) {
-                if (reaction.equals(HEART) || reaction.equals(LIKE)) {
-                    isUpdated = true;
-                    rating = rating.withPowerCounter(rating.powerCounter() + 1);
-                } else if (reaction.equals(CLOWN)) {
-                    isUpdated = true;
-                    rating = rating.withClownCounter(rating.clownCounter() + 1);
-                }
+                modifyNewReaction(reaction, rating);
             }
             // Update rating based on removed reactions
             for (String reaction : removedReactions) {
-                if (reaction.equals(HEART) || reaction.equals(LIKE)) {
-                    isUpdated = true;
-                    rating = rating.withPowerCounter(rating.powerCounter() - 1);
-                } else if (reaction.equals(CLOWN)) {
-                    isUpdated = true;
-                    rating = rating.withClownCounter(rating.clownCounter() - 1);
-                }
+                modifyRemovedReaction(reaction, rating);
             }
         }
-        if (isUpdated) {
-            ratingRepository.update(rating);
+    }
+
+    private void modifyNewReaction(String reaction, Rating rating) {
+        modifyReaction(reaction, rating, true);
+    }
+
+    private void modifyRemovedReaction(String reaction, Rating rating) {
+        modifyReaction(reaction, rating, false);
+    }
+
+    private void modifyReaction(String reaction, Rating rating, boolean isIncrementing) {
+        boolean isUpdated = false;
+        Rating updatedRating = switch (reaction) {
+          case HEART, LIKE, FIRE -> {
+            isUpdated = true;
+            yield rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? 1 : -1));
+          }
+          case CLOWN -> {
+            isUpdated = true;
+            yield rating.withClownCounter(rating.clownCounter() + (isIncrementing ? 1 : -1));
+          }
+          case POOP -> {
+            isUpdated = true;
+            yield rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? -1 : 1));
+          }
+          default -> rating;
+        };
+
+      if (isUpdated) {
+            ratingRepository.update(updatedRating);
         }
     }
 
