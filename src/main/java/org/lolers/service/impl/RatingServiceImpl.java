@@ -65,14 +65,9 @@ public class RatingServiceImpl implements RatingService {
             var removedReactions = new HashSet<>(oldReactions);
             removedReactions.removeAll(newReactions);
 
-            // Update rating based on added reactions
-            for (String reaction : addedReactions) {
-                modifyNewReaction(reaction, rating);
-            }
-            // Update rating based on removed reactions
-            for (String reaction : removedReactions) {
-                modifyRemovedReaction(reaction, rating);
-            }
+            // Update rating based on added and removed reactions
+            addedReactions.forEach(reaction -> modifyNewReaction(reaction, rating));
+            removedReactions.forEach(reaction -> modifyRemovedReaction(reaction, rating));
         }
     }
 
@@ -86,7 +81,7 @@ public class RatingServiceImpl implements RatingService {
 
     private void modifyReaction(String reaction, Rating rating, boolean isIncrementing) {
         boolean isUpdated = false;
-        Rating updatedRating = switch (reaction) {
+        var updatedRating = switch (reaction) {
           case HEART, LIKE, FIRE -> {
             isUpdated = true;
             yield rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? 1 : -1));
