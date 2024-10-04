@@ -141,7 +141,7 @@ public class AppModule extends AbstractModule {
     @Provides
     @Named("bot.username")
     public String provideBotName() {
-        return System.getenv("BOT_USERNAME");
+        return System.getProperty("BOT_USERNAME");
     }
 
     @Provides

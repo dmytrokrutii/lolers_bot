@@ -20,7 +20,6 @@ public class RatingCommand implements Command {
     private static final String CLOWN = "\uD83E\uDD21";
     private static final String POWER = "\uD83D\uDCAA";
     private static final String PRIZE = "🏆";
-    private static final String LIKE = "\uD83D\uDC4D";
     private static final String FIRE = "\uD83D\uDD25";
     private static final String HEART = "❤";
 
@@ -43,7 +42,7 @@ public class RatingCommand implements Command {
             var msg = new StringBuilder();
             ratings.sort(Comparator.comparingInt(Rating::clownCounter).reversed());
             var topPowered = ratings.stream().max(Comparator.comparingInt(Rating::powerCounter)).orElse(null);
-            var clownTop = String.format("<code>%sТоп клоун: %s</code>\n", PRIZE, userStorage.getUserById(ratings.get(0).id()).name());
+            var clownTop = String.format("<code>%sТоп клоун: %s</code>\n", PRIZE, userStorage.getUserById(ratings.getFirst().id()).name());
             msg.append(clownTop);
             var powerTop = String.format("<code>%sНайпотужніший: %s</code>\n", PRIZE, userStorage.getUserById(topPowered.id()).name());
             msg.append(powerTop);
@@ -57,7 +56,7 @@ public class RatingCommand implements Command {
                                 userStorage.getUserById(rating.id()).name()))
                         .append("\n");
             }
-            msg.append(String.format("\n%s це потужність, яка складається з %s %s %s\n", POWER, LIKE, FIRE, HEART));
+            msg.append(String.format("\n%s це потужність, яка складається з %s %s\n", POWER, FIRE, HEART));
             provider.get().replyOnMessage(update.getMessage().getChatId(), update.getMessage().getMessageId(), msg.toString(), true);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
