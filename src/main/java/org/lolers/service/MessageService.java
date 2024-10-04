@@ -13,4 +13,6 @@ public interface MessageService {
     void replyOnMessage(long chatId, int messageId, String text, boolean isHtml);
 
     void deleteMessage(DeleteMessage msg);
+
+    String getFileUrl(String fileId);
 }

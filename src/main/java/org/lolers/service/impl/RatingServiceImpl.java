@@ -21,7 +21,6 @@ public class RatingServiceImpl implements RatingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RatingServiceImpl.class);
     private static final String CLOWN = "\uD83E\uDD21";
     private static final String POOP = "\uD83D\uDCA9";
-    private static final String LIKE = "\uD83D\uDC4D";
     private static final String FIRE = "\uD83D\uDD25";
     private static final String HEART = "❤";
     private static final String REPLY_HEART = "❤️";
@@ -48,7 +47,7 @@ public class RatingServiceImpl implements RatingService {
         }
         var rating = ratingRepository.getById(userId);
         if (payload.oldReaction().isEmpty()) {
-            var reaction = (ReactionTypeEmoji) payload.newReaction().get(0);
+            var reaction = (ReactionTypeEmoji) payload.newReaction().getFirst();
             modifyNewReaction(reaction.getEmoji(), rating);
         } else {
             var oldReactions = payload.oldReaction().stream()
@@ -80,24 +79,14 @@ public class RatingServiceImpl implements RatingService {
     }
 
     private void modifyReaction(String reaction, Rating rating, boolean isIncrementing) {
-        boolean isUpdated = false;
         var updatedRating = switch (reaction) {
-          case HEART, LIKE, FIRE -> {
-            isUpdated = true;
-            yield rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? 1 : -1));
-          }
-          case CLOWN -> {
-            isUpdated = true;
-            yield rating.withClownCounter(rating.clownCounter() + (isIncrementing ? 1 : -1));
-          }
-          case POOP -> {
-            isUpdated = true;
-            yield rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? -1 : 1));
-          }
-          default -> rating;
+            case HEART, FIRE -> rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? 1 : -1));
+            case CLOWN -> rating.withClownCounter(rating.clownCounter() + (isIncrementing ? 1 : -1));
+            case POOP -> rating.withPowerCounter(rating.powerCounter() + (isIncrementing ? -1 : 1));
+            default -> rating;
         };
 
-      if (isUpdated) {
+        if (!updatedRating.equals(rating)) {
             ratingRepository.update(updatedRating);
         }
     }
@@ -105,7 +94,7 @@ public class RatingServiceImpl implements RatingService {
     @Override
     public void updateRating(long id, String payload) {
         Rating rating;
-        if (StringUtils.containsOnly(payload, PARENTHESIS) || payload.equals(REPLY_HEART) || payload.equals(LIKE) || payload.equals(HEART)) {
+        if (StringUtils.containsOnly(payload, PARENTHESIS) || payload.equals(REPLY_HEART) || payload.equals(HEART)) {
             rating = ratingRepository.getById(id);
             ratingRepository.update(rating.withPowerCounter(rating.powerCounter() + 1));
         } else if (payload.equals(CLOWN)) {

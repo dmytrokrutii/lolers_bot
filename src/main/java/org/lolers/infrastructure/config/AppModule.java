@@ -63,6 +63,7 @@ public class AppModule extends AbstractModule {
         bind(PollService.class).to(PollServiceImpl.class);
         bind(MessageBackupService.class).to(MessageBackupServiceImpl.class);
         bind(RatingService.class).to(RatingServiceImpl.class);
+        bind(TranscriptionService.class).to(TranscriptionServiceImpl.class);
         bind(Bot.class);
         bind(LolersApi.class);
         bind(Mapper.class);
@@ -140,6 +141,12 @@ public class AppModule extends AbstractModule {
     @Provides
     @Named("bot.username")
     public String provideBotName() {
-        return System.getProperty("BOT_USERNAME");
+        return System.getenv("BOT_USERNAME");
+    }
+
+    @Provides
+    @Named("assembly.key")
+    public String provideAssemblyKey() {
+        return System.getProperty("ASSEMBLY_KEY");
     }
 }

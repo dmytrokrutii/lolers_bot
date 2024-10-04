@@ -14,8 +14,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.register<Jar>("fatJar") {
@@ -46,6 +46,7 @@ dependencies {
     implementation("net.engio:mbassador:1.3.2")
     implementation("com.konghq:unirest-java:3.14.5")
     implementation("it.sauronsoftware.cron4j:cron4j:2.2.5")
+    implementation("com.assemblyai:assemblyai-java:2.3.1")
 }
 
 tasks.test {
